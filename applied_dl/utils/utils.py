@@ -97,3 +97,21 @@ class IoULoss(nn.Module):
         iou = torch.mean(iou)
 
         return 1 - iou
+
+def heatmaps_to_coordinates(heatmaps):
+    """
+    Heatmaps is a numpy array
+    Its size - (batch_size, n_keypoints, img_size, img_size)
+    """
+    batch_size = heatmaps.shape[0]
+    sums = heatmaps.sum(axis=-1).sum(axis=-1)
+    sums = np.expand_dims(sums, [2, 3])
+    normalized = heatmaps / sums
+    x_prob = normalized.sum(axis=2)
+    y_prob = normalized.sum(axis=3)
+
+    arr = np.tile(np.float32(np.arange(0, 128)), [batch_size, 21, 1])
+    x = (arr * x_prob).sum(axis=2)
+    y = (arr * y_prob).sum(axis=2)
+    keypoints = np.stack([x, y], axis=-1)
+    return keypoints / MODEL_IMG_SIZE

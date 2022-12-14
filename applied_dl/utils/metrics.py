@@ -18,7 +18,7 @@ def _calc_distances(preds, targets, mask, normalize):
         normalize (np.ndarray[N, D]): Typical value is heatmap_size
 
     Returns:
-        np.ndarray[K, N]: The normalized distances. \
+        np.ndarray[K, N]: The normalized distances. 
             If target keypoints are missing, the distance is -1.
     """
     N, K, _ = preds.shape
