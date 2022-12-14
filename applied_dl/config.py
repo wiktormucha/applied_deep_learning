@@ -1,29 +1,33 @@
 from torchvision import transforms
-# from utils.augumentations import RandomBoxes, RandomNoise, RandomBackground
 from datasets.augumentations import RandomBoxes, RandomNoise, RandomBackground
+
+MODEL_NEURONS = 16
+BB_FACTOR = 150
+
+# Data parameters
 N_KEYPOINTS = 21
 N_IMG_CHANNELS = 3
 RAW_IMG_SIZE = 224
 MODEL_IMG_SIZE = 128
-DATASET_MEANS = [0.3950, 0.4323, 0.2954]
-DATASET_STDS = [0.1966, 0.1734, 0.1836]
-MODEL_NEURONS = 16
-EXPERIMENT_NAME = "checpoint_improved_aug_pytorch"
-MODEL_IMG_SIZE = 128
-TRAIN_DATASET_MEANS = [0.4532, 0.4522, 0.4034]
-TRAIN_DATASET_STDS =[0.2218, 0.2186, 0.2413]
-BB_FACTOR = 150
-CONTINUE_FROM_CHECKPOINT = True
 RANDOM_CROP_SIZE = 180
 DATA_DIR = "/data/wmucha/datasets/FreiHAND"
-CHECKPOINT_DIR = "/caa/Homes01/wmucha/repos/applied_deep_learning/applied_dl/saved_models/fulldata_aug2_53"
+TRAIN_DATASET_MEANS = [0.4532, 0.4522, 0.4034]
+TRAIN_DATASET_STDS =[0.2218, 0.2186, 0.2413]
+DATASET_MEANS = [0.3950, 0.4323, 0.2954]
+DATASET_STDS = [0.1966, 0.1734, 0.1836]
+
+# Training parameters
+EXPERIMENT_NAME = "checpoint_improved_aug_pytorch"
 MAX_EPOCHS = 1000
 BACTH_SIZE = 16
 LEARNING_RATE = 0.1
 DEVICE = 3
 EARLY_STOPPING = 15
+CONTINUE_FROM_CHECKPOINT = True
+CHECKPOINT_DIR = "/caa/Homes01/wmucha/repos/applied_deep_learning/applied_dl/saved_models/fulldata_aug2_53"
 
 
+# Image augumentations
 TRAIN_IMG_TRANSFORM = transforms.Compose(
                 [
                     transforms.ToTensor(),
@@ -38,13 +42,11 @@ TRAIN_IMG_TRANSFORM = transforms.Compose(
 
 TRAIN_HEATMAP_TRANSFORM = transforms.Compose(
                     [
-            
                         transforms.RandomRotation(degrees=(0, 30)),
                         transforms.RandomCrop(RANDOM_CROP_SIZE),
                         transforms.Resize(MODEL_IMG_SIZE),
                         # transforms.RandomHorizontalFlip(p=0.5),
                         # transforms.RandomVerticalFlip(p=0.5),
-                    
                     ]
                 )
 
@@ -58,8 +60,6 @@ VAL_IMG_TRANSFORM = transforms.Compose(
 
 VAL_HEATMAP_TRANSFORM = transforms.Compose(
                     [
-                        # transforms.ToTensor(),
                         transforms.Resize(MODEL_IMG_SIZE),
-                        # transforms.Normalize(mean=TRAIN_DATASET_MEANS, std=TRAIN_DATASET_STDS),
                     ]
                 )
