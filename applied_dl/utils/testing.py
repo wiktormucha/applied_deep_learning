@@ -1,11 +1,12 @@
 import tqdm
-from config import *
+import matplotlib.pyplot as plt
 import numpy as np
 import sys
 sys.path.append("../")
-
+from torch.utils.data import DataLoader, Dataset
 from utils.metrics import keypoint_pck_accuracy, keypoint_epe
 from utils.utils import heatmaps_to_coordinates
+from config import *
 
 def get_bb_w_and_h(gt_keypoints, bb_factor = 1):
     '''
@@ -99,51 +100,56 @@ def batch_pck_calculation(pred_keypoints, true_keypoints, treshold = 0.2, mask =
 
     return avg_acc
 
-def evaluate(model, dataloader, using_heatmaps = True, batch_size = 0):
-    accuracy_all = []
-    image_id = []
-    pred = []
-    gt = []
-    pck_acc = []
-    epe_lst = []
-    auc_lst = []
+def show_batch_predictions(batch_data, model):
+    """
+    Visualizes image, image with actual keypoints and
+    image with predicted keypoints.
+    Finger colors are in COLORMAP.
+    Inputs:
+    - batch data is batch from dataloader
+    - model is trained model
+    """
+    inputs = batch_data["image"]
+    true_keypoints = batch_data["keypoints"].numpy()
+    batch_size = true_keypoints.shape[0]
+    pred_heatmaps = model(inputs)
+    pred_heatmaps = pred_heatmaps.detach().numpy()
+    pred_keypoints = heatmaps_to_coordinates(pred_heatmaps)
+    images = batch_data["image_raw"].numpy()
+    images = np.moveaxis(images, 1, -1)
 
-    for data in tqdm(dataloader):
-        inputs = data["image"]
-        pred_heatmaps = model(inputs)
-        # print(pred_heatmaps.shape)
-        pred_heatmaps = pred_heatmaps.detach().numpy()
-        true_keypoints = (data["keypoints"]).numpy()
+    plt.figure(figsize=[12, 4 * batch_size])
+    for i in range(batch_size):
+        image = images[i]
+        true_keypoints_img = true_keypoints[i] * RAW_IMG_SIZE
+        pred_keypoints_img = pred_keypoints[i] * RAW_IMG_SIZE
 
-        if using_heatmaps == True:
-            pred_keypoints = heatmaps_to_coordinates(pred_heatmaps)
-        else:
-            pred_keypoints = pred_heatmaps.reshape(batch_size,N_KEYPOINTS,2)
+        plt.subplot(batch_size, 3, i * 3 + 1)
+        plt.imshow(image)
+        plt.title("Image")
+        plt.axis("off")
 
-            # true_keypoints = torch.flatten(true_keypoints,1)#.to(torch.float)
+        plt.subplot(batch_size, 3, i * 3 + 2)
+        plt.imshow(image)
+        plt.scatter(true_keypoints_img[:, 0], true_keypoints_img[:, 1], c="k", alpha=0.5)
+        for finger, params in COLORMAP.items():
+            plt.plot(
+                true_keypoints_img[params["ids"], 0],
+                true_keypoints_img[params["ids"], 1],
+                params["color"],
+            )
+        plt.title("True Keypoints")
+        plt.axis("off")
 
-        # print('Pred shape: ', pred_keypoints.shape)
-        # print('GT shape: ', true_keypoints.shape)
-
-        accuracy_keypoint = ((true_keypoints - pred_keypoints) ** 2).sum(axis=2) ** (1 / 2)
-        accuracy_image = accuracy_keypoint.mean(axis=1)
-        accuracy_all.extend(list(accuracy_image))
-
-        # Calculate PCK@02
-        avg_acc = batch_pck_calculation(pred_keypoints, true_keypoints, treshold = 0.2, mask = None, normalize = None)
-        pck_acc.append(avg_acc)
-
-        # Calculate EPE mean and median, mind that it depends on what scale of input keypoints 
-        epe = batch_epe_calculation(pred_keypoints, true_keypoints)
-        epe_lst.append(epe)
-
-        #TODO calculate AUC
-        auc = batch_auc_calculation(pred_keypoints, true_keypoints, num_step=20, mask = None)
-        auc_lst.append(auc)
-
-    pck = sum(pck_acc) / len(pck_acc)
-    epe_final = sum(epe_lst) / len(epe_lst)
-    auc_final = sum(auc_lst) / len(auc_lst)
-
-    print (f'PCK@2: {pck}, EPE: {epe_final}, AUC: {auc_final}')
-    return accuracy_all, pck
+        plt.subplot(batch_size, 3, i * 3 + 3)
+        plt.imshow(image)
+        plt.scatter(pred_keypoints_img[:, 0], pred_keypoints_img[:, 1], c="k", alpha=0.5)
+        for finger, params in COLORMAP.items():
+            plt.plot(
+                pred_keypoints_img[params["ids"], 0],
+                pred_keypoints_img[params["ids"], 1],
+                params["color"],
+            )
+        plt.title("Pred Keypoints")
+        plt.axis("off")
+    plt.tight_layout()

@@ -26,7 +26,16 @@ EARLY_STOPPING = 15
 CONTINUE_FROM_CHECKPOINT = True
 CHECKPOINT_DIR = "/caa/Homes01/wmucha/repos/applied_deep_learning/applied_dl/saved_models/fulldata_aug2_53"
 
-
+# Testing parameters
+TESTING_DEVICE = 0
+TESTING_BATCH_SIZE = BACTH_SIZE
+COLORMAP = {
+    "thumb": {"ids": [0, 1, 2, 3, 4], "color": "g"},
+    "index": {"ids": [0, 5, 6, 7, 8], "color": "c"},
+    "middle": {"ids": [0, 9, 10, 11, 12], "color": "b"},
+    "ring": {"ids": [0, 13, 14, 15, 16], "color": "m"},
+    "little": {"ids": [0, 17, 18, 19, 20], "color": "r"},
+}
 # Image augumentations
 TRAIN_IMG_TRANSFORM = transforms.Compose(
                 [
