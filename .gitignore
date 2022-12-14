@@ -1,0 +1,9 @@
+mediapipe-master
+applied_dl/lib
+applied_dl/saved_models
+temp_files
+
+
+*.pyc
+.vscode/launch.json
+applied_dl/.vscode/launch.json
