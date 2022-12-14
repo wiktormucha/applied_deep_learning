@@ -1,3 +1,6 @@
+from torchvision import transforms
+# from utils.augumentations import RandomBoxes, RandomNoise, RandomBackground
+from datasets.augumentations import RandomBoxes, RandomNoise, RandomBackground
 N_KEYPOINTS = 21
 N_IMG_CHANNELS = 3
 RAW_IMG_SIZE = 224
@@ -12,3 +15,51 @@ TRAIN_DATASET_STDS =[0.2218, 0.2186, 0.2413]
 BB_FACTOR = 150
 CONTINUE_FROM_CHECKPOINT = True
 RANDOM_CROP_SIZE = 180
+DATA_DIR = "/data/wmucha/datasets/FreiHAND"
+CHECKPOINT_DIR = "/caa/Homes01/wmucha/repos/applied_deep_learning/applied_dl/saved_models/fulldata_aug2_53"
+MAX_EPOCHS = 1000
+BACTH_SIZE = 16
+LEARNING_RATE = 0.1
+DEVICE = 3
+EARLY_STOPPING = 15
+
+
+TRAIN_IMG_TRANSFORM = transforms.Compose(
+                [
+                    transforms.ToTensor(),
+                    transforms.RandomRotation(degrees=(0, 30)),
+                    transforms.RandomCrop(RANDOM_CROP_SIZE),
+                    transforms.Resize(MODEL_IMG_SIZE),
+                    # transforms.RandomHorizontalFlip(p=0.5),
+                    # transforms.RandomVerticalFlip(p=0.5),
+                    transforms.Normalize(mean=TRAIN_DATASET_MEANS, std=TRAIN_DATASET_STDS),
+                ]
+            )
+
+TRAIN_HEATMAP_TRANSFORM = transforms.Compose(
+                    [
+            
+                        transforms.RandomRotation(degrees=(0, 30)),
+                        transforms.RandomCrop(RANDOM_CROP_SIZE),
+                        transforms.Resize(MODEL_IMG_SIZE),
+                        # transforms.RandomHorizontalFlip(p=0.5),
+                        # transforms.RandomVerticalFlip(p=0.5),
+                    
+                    ]
+                )
+
+VAL_IMG_TRANSFORM = transforms.Compose(
+                    [
+                        transforms.ToTensor(),
+                        transforms.Resize(MODEL_IMG_SIZE),
+                        transforms.Normalize(mean=TRAIN_DATASET_MEANS, std=TRAIN_DATASET_STDS),
+                    ]
+                )
+
+VAL_HEATMAP_TRANSFORM = transforms.Compose(
+                    [
+                        # transforms.ToTensor(),
+                        transforms.Resize(MODEL_IMG_SIZE),
+                        # transforms.Normalize(mean=TRAIN_DATASET_MEANS, std=TRAIN_DATASET_STDS),
+                    ]
+                )
