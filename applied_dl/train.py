@@ -42,7 +42,7 @@ def main():
         pin_memory=True
     )
 
-    val_dataset = FreiHAND(config=config, set_type="val", img_transform= VAL_IMG_TRANSFORM, heatmap_transform= VAL_HEATMAP_TRANSFORM)
+    val_dataset = FreiHAND(config=config, set_type="val", img_transform= VAL_IMG_TRANSFORM, heatmap_transform= None)
     
     val_dataloader = DataLoader(
         val_dataset,
@@ -65,7 +65,7 @@ def main():
 
     criterion = IoULoss()
     #  criterion = nn.MSELoss() # Use this loss in case of regression head
-    optimizer = optim.SGD(model.parameters(), lr=config["learning_rate"], weight_decay=1e-5)
+    optimizer = optim.SGD(model.parameters(), lr=config["learning_rate"], weight_decay=1e-5, momentum= MOMENTUM)
    
     scheduler = optim.lr_scheduler.ReduceLROnPlateau(
         optimizer=optimizer, factor=0.5, patience=7, verbose=True, threshold=0.00001
