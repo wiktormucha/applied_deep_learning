@@ -45,9 +45,9 @@ class FreiHAND(Dataset):
             n_end = len(self.anno)
         elif set_type == "val":
             n_start = 104192
-            n_end = 123728
+            n_end = 117216
         else:
-            n_start = 123728
+            n_start = 117216
             n_end = len(self.anno)
 
         self.image_names = self.image_names[n_start:n_end]
