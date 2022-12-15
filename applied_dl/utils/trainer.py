@@ -4,7 +4,7 @@ This file contains Trainer class for training the models
 import numpy as np
 import torch
 from tqdm import tqdm
-
+import pandas as pd
 from config import *
 
 class Trainer:
@@ -43,6 +43,12 @@ class Trainer:
                     np.round(self.loss["val"][-1], 10),
                 )
             )
+            
+            # Save loss every epoch
+            df = pd.DataFrame()
+            df['train_los'] = self.loss["train"]
+            df['val_los'] = self.loss["val"]
+            df.to_csv(f'{EXPERIMENT_NAME}.csv')
 
             # reducing LR if no improvement in training
             if self.scheduler is not None:
