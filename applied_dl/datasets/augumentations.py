@@ -18,15 +18,15 @@ def decision(probability):
 
 
 class RandomNoise(nn.Module):
-    def __init__(self) -> None:
+    def __init__(self, p=0.5) -> None:
         super().__init__()
-
+        self.p = p
     def forward(self, img):
 
         assert torch.is_tensor(img)
 
         noise_factor = 0.1
-        flag = decision(probability = 0.3)
+        flag = decision(probability = self.p)
 
         if flag == False:
             return img
@@ -37,20 +37,20 @@ class RandomNoise(nn.Module):
     
 
 class RandomBoxes(nn.Module):
-    def __init__(self) -> None:
+    def __init__(self, p =0.5) -> None:
         super().__init__()
-
+        self.p = p
     def forward(self, img):
 
         assert torch.is_tensor(img)
 
-        flag = decision(probability = 0.3)
+        flag = decision(probability = self.p)
 
         if flag == False:
             return img
         
 
-        size = 14
+        size = 50
         n_k = 5
         
         h,w = size,size
@@ -62,7 +62,7 @@ class RandomBoxes(nn.Module):
             img[y:y+h,x:x+w] = 0
             boxes.append((x,y,h,w))
         # img = Image.fromarray(img.astype('uint8'), 'RGB')
-
+            print('random_box')
         return torch.from_numpy(img)
 
 
